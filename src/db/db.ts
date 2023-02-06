@@ -8,11 +8,25 @@ import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator'
 import { TrackEntity } from 'src/tracks/entities/track.entity';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
+import { ArtistEntity } from 'src/artists/entities/artist.entity';
+import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
+import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
 
 @Injectable()
 class InMemoryDB implements IInMemoryDB {
   private users: UserEntity[] = [];
   private tracks: TrackEntity[] = [];
+  private artists: ArtistEntity[] = [];
+
+  private static instance: InMemoryDB;
+
+  constructor() {
+    if (!InMemoryDB.instance) {
+      InMemoryDB.instance = this;
+    }
+
+    return InMemoryDB.instance;
+  }
 
   getAllUsers = () => map(this.users, (x) => x);
 
@@ -63,8 +77,6 @@ class InMemoryDB implements IInMemoryDB {
   getTrackById = (id: string) => find(this.tracks, (x) => x.id === id);
 
   createTrack = (data: CreateTrackDto) => {
-    const dateNow = Date.now();
-
     const track: TrackEntity = {
       ...data,
       id: uuid(),
@@ -93,6 +105,41 @@ class InMemoryDB implements IInMemoryDB {
     }
 
     return track;
+  };
+
+  getAllArtists = () => this.artists;
+
+  getArtistById = (id: string) => find(this.artists, (x) => x.id === id);
+
+  createArtist = (data: CreateArtistDto) => {
+    const artist: ArtistEntity = {
+      ...data,
+      id: uuid(),
+    };
+
+    this.artists.push(artist);
+
+    return artist;
+  };
+
+  updateArtist = (id: string, data: UpdateArtistDto) => {
+    const artist = find(this.artists, (x) => x.id === id);
+
+    if (artist) {
+      Object.assign(artist, data);
+    }
+    return artist;
+  };
+
+  deleteArtistById = (id: string) => {
+    const artistIndex = findIndex(this.artists, (x) => x.id === id);
+    let artist: ArtistEntity | undefined = undefined;
+
+    if (~artistIndex) {
+      artist = this.artists.splice(artistIndex, 1)?.[0];
+    }
+
+    return artist;
   };
 }
 
