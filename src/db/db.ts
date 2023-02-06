@@ -3,7 +3,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { IInMemoryDB } from './db-interface';
-import { map, find, findIndex, filter, pick, uniq } from 'lodash';
+import { map, find, findIndex, filter } from 'lodash';
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 import { TrackEntity } from 'src/tracks/entities/track.entity';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
