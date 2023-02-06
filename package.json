@@ -18,6 +18,7 @@
     "test:users": "jest \"./test/users.e2e.spec.ts\"",
     "test:tracks": "jest \"./test/tracks.e2e.spec.ts\"",
     "test:artists": "jest \"./test/artists.e2e.spec.ts\"",
+    "test:albums": "jest \"./test/albums.e2e.spec.ts\"",
     "test:auth": "cross-env TEST_MODE=auth jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

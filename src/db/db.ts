@@ -11,12 +11,16 @@ import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
 import { ArtistEntity } from 'src/artists/entities/artist.entity';
 import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
 import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
+import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
+import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
+import { AlbumEntity } from 'src/albums/entities/album.entity';
 
 @Injectable()
 class InMemoryDB implements IInMemoryDB {
   private users: UserEntity[] = [];
   private tracks: TrackEntity[] = [];
   private artists: ArtistEntity[] = [];
+  private albums: AlbumEntity[] = [];
 
   private static instance: InMemoryDB;
 
@@ -140,6 +144,41 @@ class InMemoryDB implements IInMemoryDB {
     }
 
     return artist;
+  };
+
+  getAllAlbums = () => this.albums;
+
+  getAlbumById = (id: string) => find(this.albums, (x) => x.id === id);
+
+  createAlbum = (data: CreateAlbumDto) => {
+    const album: AlbumEntity = {
+      ...data,
+      id: uuid(),
+    };
+
+    this.albums.push(album);
+
+    return album;
+  };
+
+  updateAlbum = (id: string, data: UpdateAlbumDto) => {
+    const album = find(this.albums, (x) => x.id === id);
+
+    if (album) {
+      Object.assign(album, data);
+    }
+    return album;
+  };
+
+  deleteAlbumById = (id: string) => {
+    const albumIndex = findIndex(this.albums, (x) => x.id === id);
+    let album: AlbumEntity | undefined = undefined;
+
+    if (~albumIndex) {
+      album = this.albums.splice(albumIndex, 1)?.[0];
+    }
+
+    return album;
   };
 }
 

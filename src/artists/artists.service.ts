@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import InMemoryDB from 'src/db/db';
-import { isEmpty, filter } from 'lodash';
+import { filter } from 'lodash';
 
 @Injectable()
 export class ArtistsService {
