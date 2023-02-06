@@ -3,7 +3,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { IInMemoryDB } from './db-interface';
-import { map, find, findIndex, omit, pick } from 'lodash';
+import { map, find, findIndex, filter, pick, uniq } from 'lodash';
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 import { TrackEntity } from 'src/tracks/entities/track.entity';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
@@ -14,6 +14,7 @@ import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
 import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
 import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 import { AlbumEntity } from 'src/albums/entities/album.entity';
+import { FavoriteEntity } from 'src/favorites/entities/favorite.entity';
 
 @Injectable()
 class InMemoryDB implements IInMemoryDB {
@@ -21,6 +22,11 @@ class InMemoryDB implements IInMemoryDB {
   private tracks: TrackEntity[] = [];
   private artists: ArtistEntity[] = [];
   private albums: AlbumEntity[] = [];
+  private favorites: FavoriteEntity = {
+    artists: [],
+    albums: [],
+    tracks: [],
+  };
 
   private static instance: InMemoryDB;
 
@@ -179,6 +185,61 @@ class InMemoryDB implements IInMemoryDB {
     }
 
     return album;
+  };
+
+  getAllFavorites = () => this.favorites;
+
+  addArtistToFavorites = (id: string) => {
+    if (!find(this.favorites.artists, (a) => a === id)) {
+      this.favorites.artists.push(id);
+    }
+    return id;
+  };
+
+  addTrackToFavorites = (id: string) => {
+    if (!find(this.favorites.tracks, (t) => t === id)) {
+      this.favorites.tracks.push(id);
+    }
+
+    return id;
+  };
+
+  addAlbumToFavorites = (id: string) => {
+    if (!find(this.favorites.albums, (a) => a === id)) {
+      this.favorites.albums.push(id);
+    }
+
+    return id;
+  };
+
+  removeTrackFromFavorites = (id: string) => {
+    const trackId = find(this.favorites.tracks, (t) => t === id);
+
+    if (trackId) {
+      this.favorites.tracks = filter(this.favorites.tracks, (t) => t !== id);
+    }
+
+    return trackId;
+  };
+
+  removeAlbumFromFavorites = (id: string) => {
+    const albumId = find(this.favorites.albums, (a) => a === id);
+
+    if (albumId) {
+      this.favorites.albums = filter(this.favorites.albums, (a) => a !== id);
+    }
+
+    return albumId;
+  };
+
+  removeArtistFromFavorites = (id: string) => {
+    const artistId = find(this.favorites.artists, (a) => a === id);
+
+    if (artistId) {
+      this.favorites.artists = filter(this.favorites.artists, (a) => a !== id);
+    }
+
+    return artistId;
   };
 }
 

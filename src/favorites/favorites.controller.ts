@@ -2,44 +2,77 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Put,
   Param,
   Delete,
+  ParseUUIDPipe,
+  HttpCode,
+  NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 
-@Controller('favorites')
+@Controller('favs')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
-
-  @Post()
-  create(@Body() createFavoriteDto: CreateFavoriteDto) {
-    return this.favoritesService.create(createFavoriteDto);
-  }
 
   @Get()
   findAll() {
     return this.favoritesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favoritesService.findOne(+id);
+  @Post('track/:id')
+  @HttpCode(201)
+  addTrack(@Param('id', ParseUUIDPipe) id: string) {
+    const responce = this.favoritesService.addTrack(id);
+    if (responce) return responce;
+
+    throw new UnprocessableEntityException();
   }
 
-  @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFavoriteDto: UpdateFavoriteDto,
-  ) {
-    return this.favoritesService.update(+id, updateFavoriteDto);
+  @Delete('track/:id')
+  @HttpCode(204)
+  removeTrack(@Param('id', ParseUUIDPipe) id: string) {
+    const responce = this.favoritesService.removeTrack(id);
+    if (responce) return responce;
+
+    throw new NotFoundException();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.favoritesService.remove(+id);
+  @Post('album/:id')
+  @HttpCode(201)
+  addAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    const responce = this.favoritesService.addAlbum(id);
+    if (responce) return responce;
+
+    throw new UnprocessableEntityException();
+  }
+
+  @Delete('album/:id')
+  @HttpCode(204)
+  removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    const responce = this.favoritesService.removeAlbum(id);
+    if (responce) return responce;
+
+    throw new NotFoundException();
+  }
+
+  @Post('artist/:id')
+  @HttpCode(201)
+  addArtist(@Param('id', ParseUUIDPipe) id: string) {
+    const responce = this.favoritesService.addArtist(id);
+    if (responce) return responce;
+
+    throw new UnprocessableEntityException();
+  }
+
+  @Delete('artist/:id')
+  @HttpCode(204)
+  removeArtist(@Param('id', ParseUUIDPipe) id: string) {
+    const responce = this.favoritesService.removeArtist(id);
+    if (responce) return responce;
+
+    throw new NotFoundException();
   }
 }
