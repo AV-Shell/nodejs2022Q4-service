@@ -3,8 +3,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { omit, map } from 'lodash';
-import InMemoryDB from '../db/db';
 import { ForbiddenException } from '@nestjs/common/exceptions';
+import InMemoryDB from 'src/db/db';
 
 @Injectable()
 export class UsersService {
