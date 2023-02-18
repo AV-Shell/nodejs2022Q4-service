@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import InMemoryDB from 'src/db/db';
+import InMemoryDB from '../db/db';
 import { filter, includes } from 'lodash';
 
 @Injectable()

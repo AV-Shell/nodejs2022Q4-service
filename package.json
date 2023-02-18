@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "docker": "nodemon --exitcrash -L src/main.ts",
+    "docker:scan": "docker scan avshell/node2022q4 && docker scan avshell/postgres2022q4 ",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

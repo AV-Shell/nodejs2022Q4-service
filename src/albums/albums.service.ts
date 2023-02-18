@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import InMemoryDB from 'src/db/db';
+import InMemoryDB from '../db/db';
 import { filter } from 'lodash';
 
 @Injectable()

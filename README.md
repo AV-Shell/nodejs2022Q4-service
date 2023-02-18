@@ -41,6 +41,14 @@ docker-compose up
 docker-compose down
 ```
 
+## Scan docker images
+
+ 1) Run in terminal next command : 
+
+```
+npm run docker:scan
+```
+
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
