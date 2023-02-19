@@ -8,6 +8,10 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Album } from './albums/entities/album.entity';
+import { Artist } from './artists/entities/artist.entity';
+import { Favorites } from './favorites/entities/favorites.entity';
+import { Track } from './tracks/entities/track.entity';
 import { User } from './users/entities/user.entity';
 
 @Module({
@@ -24,9 +28,11 @@ import { User } from './users/entities/user.entity';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       dropSchema: true,
-      synchronize: true,
+      synchronize: false,
+      migrationsRun: true,
+      migrations: ['src/migrations/*'],
       logging: false,
-      entities: [User],
+      entities: [User, Album, Artist, Favorites, Track],
       autoLoadEntities: true,
     }),
     UsersModule,

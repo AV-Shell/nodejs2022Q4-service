@@ -4,5 +4,4 @@ node_modules
 .git
 nodemon.json
 docs
-doc
 logs
