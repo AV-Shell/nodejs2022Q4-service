@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { filter, includes, reduce } from 'lodash';
+import { filter, reduce } from 'lodash';
 import { Favorites } from './entities/favorites.entity';
 import { Album } from '../albums/entities/album.entity';
 import { Artist } from '../artists/entities/artist.entity';

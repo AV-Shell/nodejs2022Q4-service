@@ -5,7 +5,6 @@ import {
   Column,
   ManyToOne,
   OneToOne,
-  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { Artist } from '../../artists/entities/artist.entity';

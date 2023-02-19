@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
-import { filter } from 'lodash';
+// import { filter } from 'lodash';
 
 @Injectable()
 export class AlbumsService {
