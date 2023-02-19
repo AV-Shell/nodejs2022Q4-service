@@ -8,15 +8,7 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/user.entity';
-
-console.log({
-  host: process.env.POSTGRES_HOST,
-  port: +process.env.POSTGRES_PORT,
-  username: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  database: process.env.POSTGRES_DB,
-});
+import { User } from './users/entities/user.entity';
 
 @Module({
   controllers: [AppController],
@@ -26,6 +18,7 @@ console.log({
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,
+      // host: undefined,
       port: +process.env.POSTGRES_PORT,
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
@@ -44,3 +37,11 @@ console.log({
   ],
 })
 export class AppModule {}
+
+console.log({
+  host: process.env.POSTGRES_HOST,
+  port: +process.env.POSTGRES_PORT,
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  envFilePath: '.env',
+});

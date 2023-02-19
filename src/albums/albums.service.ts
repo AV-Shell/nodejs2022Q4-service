@@ -1,39 +1,62 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import InMemoryDB from '../db/db';
+import { Album } from './entities/album.entity';
 import { filter } from 'lodash';
 
 @Injectable()
 export class AlbumsService {
-  constructor(@Inject('IInMemoryDB') private db: InMemoryDB) {}
-  create(createAlbumDto: CreateAlbumDto) {
-    return this.db.createAlbum(createAlbumDto);
+  constructor(
+    @InjectRepository(Album)
+    private albumsRepository: Repository<Album>,
+  ) {}
+
+  async create(dto: CreateAlbumDto): Promise<Album> {
+    const album = await this.albumsRepository.create(dto);
+
+    return this.albumsRepository.save(album);
   }
 
-  findAll() {
-    return this.db.getAllAlbums();
+  async findAll(): Promise<Album[]> {
+    return this.albumsRepository.find();
   }
 
-  findOne(id: string) {
-    return this.db.getAlbumById(id);
+  async findOne(id: string): Promise<Album> {
+    return this.albumsRepository.findOne({ where: { id } });
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    return this.db.updateAlbum(id, updateAlbumDto);
-  }
-
-  remove(id: string) {
-    const album = this.db.deleteAlbumById(id);
-
-    if (album) {
-      const tracks = filter(this.db.getAllTracks(), (t) => t.albumId === id);
-
-      tracks.forEach((t) => {
-        this.db.updateTrack(t.id, { albumId: null });
-      });
+  async update(id: string, dto: UpdateAlbumDto): Promise<Album> {
+    let album = await this.albumsRepository.findOne({ where: { id } });
+    if (!album) {
+      return;
     }
 
+    album = await this.albumsRepository.merge(album, dto);
+
+    return await this.albumsRepository.save(album);
+  }
+
+  // remove(id: string) {
+  //   const album = this.db.deleteAlbumById(id);
+
+  //   if (album) {
+  //     const tracks = filter(this.db.getAllTracks(), (t) => t.albumId === id);
+
+  //     tracks.forEach((t) => {
+  //       this.db.updateTrack(t.id, { albumId: null });
+  //     });
+  //   }
+
+  //   return album;
+  // }
+  async remove(id: string): Promise<Album> {
+    const album = await this.albumsRepository.findOne({ where: { id } });
+    if (!album) {
+      return;
+    }
+    await this.albumsRepository.delete(id);
     return album;
   }
 }

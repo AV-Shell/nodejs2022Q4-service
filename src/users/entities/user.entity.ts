@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { ResponceUserDto } from './dto/responce-user.dto';
+import { ResponceUserDto } from '../dto/responce-user.dto';
 
 @Entity()
 export class User {

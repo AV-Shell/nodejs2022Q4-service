@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ResponceUserDto } from './dto/responce-user.dto';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 import { ForbiddenException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -25,7 +25,6 @@ export class UsersService {
     user = await this.usersRepository.save(user);
     const userToResponce = User.toResponse(user);
 
-    console.log('created user', user);
     return userToResponce;
   }
 
