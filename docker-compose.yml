@@ -13,6 +13,8 @@ services:
     restart: always
     environment:
       - PORT=${PORT}
+    env_file:
+      - .env
     networks:
       - custom-network
     container_name: avshell-node
@@ -27,6 +29,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    env_file:
+      - .env
     volumes:
       - db_log_volume:/logs:z
       - db_data_volume:/var/lib/postgresql/data

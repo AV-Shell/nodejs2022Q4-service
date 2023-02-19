@@ -10,47 +10,60 @@ import {
   HttpCode,
   NotFoundException,
 } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ResponceUserDto } from './dto/responce-user.dto';
 
+@ApiTags('Users')
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({ summary: 'Create a user' })
+  @ApiResponse({ status: 201, type: ResponceUserDto })
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
   }
 
+  @ApiOperation({ summary: 'Get All Users' })
+  @ApiResponse({ status: 200, type: [ResponceUserDto] })
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    return await this.usersService.findAll();
   }
 
+  @ApiOperation({ summary: 'Get User by Id' })
+  @ApiResponse({ status: 200, type: ResponceUserDto })
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const user = this.usersService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const user = await this.usersService.findOne(id);
     if (user) return user;
 
     throw new NotFoundException();
   }
 
+  @ApiOperation({ summary: 'Update a user' })
+  @ApiResponse({ status: 201, type: ResponceUserDto })
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const user = this.usersService.update(id, updateUserDto);
+    const user = await this.usersService.update(id, updateUserDto);
     if (user) return user;
 
     throw new NotFoundException();
   }
 
+  @ApiOperation({ summary: 'Update a user' })
+  @ApiResponse({ status: 201, type: ResponceUserDto })
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const user = this.usersService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const user = await this.usersService.remove(id);
     if (user) return user;
     throw new NotFoundException();
   }

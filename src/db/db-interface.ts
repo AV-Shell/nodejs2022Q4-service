@@ -1,6 +1,6 @@
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { User } from 'src/users/user.entity';
 import { TrackEntity } from 'src/tracks/entities/track.entity';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
@@ -12,11 +12,11 @@ import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 import { AlbumEntity } from 'src/albums/entities/album.entity';
 
 export interface IInMemoryDB {
-  getAllUsers: () => UserEntity[];
-  getUserById: (id: string) => UserEntity | undefined;
-  createUser: (data: CreateUserDto) => UserEntity;
-  updateUser: (id: string, data: UpdateUserDto) => UserEntity | undefined;
-  deleteUserById: (id: string) => UserEntity | undefined;
+  getAllUsers: () => User[];
+  getUserById: (id: string) => User | undefined;
+  createUser: (data: CreateUserDto) => User;
+  updateUser: (id: string, data: UpdateUserDto) => User | undefined;
+  deleteUserById: (id: string) => User | undefined;
 
   getAllTracks: () => TrackEntity[];
   getTrackById: (id: string) => TrackEntity | undefined;

@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { User } from 'src/users/user.entity';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { IInMemoryDB } from './db-interface';
 import { map, find, findIndex, filter } from 'lodash';
@@ -18,7 +18,7 @@ import { FavoriteEntity } from 'src/favorites/entities/favorite.entity';
 
 @Injectable()
 class InMemoryDB implements IInMemoryDB {
-  private users: UserEntity[] = [];
+  private users: User[] = [];
   private tracks: TrackEntity[] = [];
   private artists: ArtistEntity[] = [];
   private albums: AlbumEntity[] = [];
@@ -43,9 +43,9 @@ class InMemoryDB implements IInMemoryDB {
   getUserById = (id: string) => find(this.users, (x) => x.id === id);
 
   createUser = (data: CreateUserDto) => {
-    const dateNow = Date.now();
+    const dateNow = new Date().toISOString();
 
-    const user: UserEntity = {
+    const user: User = {
       ...data,
       version: 1,
       createdAt: dateNow,
@@ -73,7 +73,7 @@ class InMemoryDB implements IInMemoryDB {
 
   deleteUserById = (id: string) => {
     const userIndex = findIndex(this.users, (x) => x.id === id);
-    let user: UserEntity | undefined = undefined;
+    let user: User | undefined = undefined;
 
     if (~userIndex) {
       user = this.users.splice(userIndex, 1)?.[0];
