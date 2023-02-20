@@ -8,7 +8,13 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/AV-Shell/nodejs2022Q4-service.git
+```
+
+## Change branch to dev
+
+```
+git checkout dev
 ```
 
 ## Installing NPM modules
