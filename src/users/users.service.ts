@@ -6,6 +6,9 @@ import { User } from './entities/user.entity';
 import { ForbiddenException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+
+const SALT_ROUNDS = 10;
 
 @Injectable()
 export class UsersService {
@@ -16,8 +19,14 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<ResponceUserDto> {
     const dateNow: string = new Date().toISOString();
+
+    const hashPassword = await this.generateHashPassword(
+      createUserDto.password,
+    );
+    console.log('hashPassword', hashPassword);
     let user = await this.usersRepository.create({
       ...createUserDto,
+      password: hashPassword,
       version: 1,
       createdAt: dateNow,
       updatedAt: dateNow,
@@ -45,14 +54,21 @@ export class UsersService {
       return;
     }
 
-    if (user.password !== dto.oldPassword) {
+    const passwordEquals = await bcrypt.compare(
+      dto.oldPassword,
+      user.password ?? '',
+    );
+
+    if (!passwordEquals) {
       throw new ForbiddenException();
     }
+
+    const hashPassword = await this.generateHashPassword(dto.newPassword);
 
     user = await this.usersRepository.merge(user, {
       version: user.version + 1,
       updatedAt: new Date().toISOString(),
-      password: dto.newPassword,
+      password: hashPassword,
     });
 
     user = await this.usersRepository.save(user);
@@ -67,5 +83,38 @@ export class UsersService {
     }
     await this.usersRepository.delete(id);
     return User.toResponse(user);
+  }
+
+  async getUserByLogin(login: string): Promise<User> {
+    return this.usersRepository.findOne({ where: { login } });
+  }
+
+  async validateUser(createUserDto: CreateUserDto): Promise<ResponceUserDto> {
+    const user = await this.usersRepository.findOne({
+      where: { login: createUserDto.login },
+    });
+
+    if (!user) {
+      throw new ForbiddenException();
+    }
+
+    const passwordEquals = await bcrypt.compare(
+      createUserDto.password,
+      user.password ?? '',
+    );
+
+    if (!passwordEquals) {
+      throw new ForbiddenException();
+    }
+
+    return User.toResponse(user);
+  }
+
+  private async generateHashPassword(pass: string): Promise<string> {
+    const saltRounds = process.env.SALT_ROUNDS
+      ? +process.env.SALT_ROUNDS
+      : SALT_ROUNDS;
+
+    return bcrypt.hash(pass, saltRounds);
   }
 }
