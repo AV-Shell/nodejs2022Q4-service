@@ -1,51 +1,71 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserDto } from './dto/user.dto';
-import { omit, map } from 'lodash';
+import { ResponceUserDto } from './dto/responce-user.dto';
+import { User } from './entities/user.entity';
 import { ForbiddenException } from '@nestjs/common/exceptions';
-import InMemoryDB from 'src/db/db';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject('IInMemoryDB') private db: InMemoryDB) {}
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-  create(createUserDto: CreateUserDto): UserDto {
-    const user = this.db.createUser(createUserDto);
-    return omit(user, ['password']);
+  async create(createUserDto: CreateUserDto): Promise<ResponceUserDto> {
+    const dateNow: string = new Date().toISOString();
+    let user = await this.usersRepository.create({
+      ...createUserDto,
+      version: 1,
+      createdAt: dateNow,
+      updatedAt: dateNow,
+    });
+    user = await this.usersRepository.save(user);
+    const userToResponce = User.toResponse(user);
+
+    return userToResponce;
   }
 
-  findAll(): UserDto[] {
-    return map(this.db.getAllUsers(), (user) => omit(user, ['password']));
+  async findAll(): Promise<ResponceUserDto[]> {
+    const users = await this.usersRepository.find();
+    return users.map((user) => User.toResponse(user));
   }
 
-  findOne(id: string): UserDto | undefined {
-    const user = this.db.getUserById(id);
-    if (user) {
-      return omit(user, ['password']);
-    }
+  async findOne(id: string): Promise<ResponceUserDto> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+
+    return user ? User.toResponse(user) : undefined;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto): UserDto | undefined {
-    let user = this.db.getUserById(id);
+  async update(id: string, dto: UpdateUserDto): Promise<ResponceUserDto> {
+    let user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       return;
     }
 
-    if (user.password !== updateUserDto.oldPassword) {
+    if (user.password !== dto.oldPassword) {
       throw new ForbiddenException();
     }
 
-    user = this.db.updateUser(id, updateUserDto);
-    if (user) {
-      return omit(user, ['password']);
-    }
+    user = await this.usersRepository.merge(user, {
+      version: user.version + 1,
+      updatedAt: new Date().toISOString(),
+      password: dto.newPassword,
+    });
+
+    user = await this.usersRepository.save(user);
+    const userToResponce = User.toResponse(user);
+    return userToResponce;
   }
 
-  remove(id: string): UserDto {
-    const user = this.db.deleteUserById(id);
-    if (user) {
-      return omit(user, ['password']);
+  async remove(id: string): Promise<ResponceUserDto> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      return;
     }
+    await this.usersRepository.delete(id);
+    return User.toResponse(user);
   }
 }

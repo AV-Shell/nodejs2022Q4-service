@@ -1,16 +1,12 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AlbumsService } from './albums.service';
 import { AlbumsController } from './albums.controller';
-import InMemoryDB from 'src/db/db';
+import { Album } from './entities/album.entity';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Album])],
   controllers: [AlbumsController],
-  providers: [
-    AlbumsService,
-    {
-      provide: 'IInMemoryDB',
-      useClass: InMemoryDB,
-    },
-  ],
+  providers: [AlbumsService],
 })
 export class AlbumsModule {}

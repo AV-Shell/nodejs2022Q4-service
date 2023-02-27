@@ -14,7 +14,7 @@ git clone https://github.com/AV-Shell/nodejs2022Q4-service.git
 ## Change branch to dev
 
 ```
-git checkout dev
+git checkout task7-home-library-service-part-2-dev
 ```
 
 ## Installing NPM modules
@@ -23,17 +23,46 @@ git checkout dev
 npm install
 ```
 
-## Running application
+## Running application in docker: 
+
+ 1) Download and install [Docker](https://docs.docker.com/engine/install/)
+
+ 2) Run in terminal next command : 
 
 ```
-npm start
+docker-compose up
 ```
+
+## Stop app in docker:
+
+ 1) Run in terminal next command : 
+
+```
+docker-compose down
+```
+
+## Scan docker images
+
+ 1) Run in terminal next command : 
+
+```
+npm run docker:scan
+```
+
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
+
+Before starting test you need install npm packages
+
+open new terminal and enter:
+
+```
+npm install
+```
 
 After application running open new terminal and enter:
 

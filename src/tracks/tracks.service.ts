@@ -1,29 +1,48 @@
-import { Inject, Injectable } from '@nestjs/common';
-import InMemoryDB from 'src/db/db';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Track } from './entities/track.entity';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Injectable()
 export class TracksService {
-  constructor(@Inject('IInMemoryDB') private db: InMemoryDB) {}
+  constructor(
+    @InjectRepository(Track)
+    private trackRepository: Repository<Track>,
+  ) {}
 
-  create(createTrackDto: CreateTrackDto) {
-    return this.db.createTrack(createTrackDto);
+  async create(dto: CreateTrackDto): Promise<Track> {
+    const track = this.trackRepository.create(dto);
+
+    return this.trackRepository.save(track);
   }
 
-  findAll() {
-    return this.db.getAllTracks();
+  async findAll(): Promise<Track[]> {
+    return await this.trackRepository.find();
   }
 
-  findOne(id: string) {
-    return this.db.getTrackById(id);
+  async findOne(id: string): Promise<Track> {
+    return await this.trackRepository.findOne({ where: { id } });
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
-    return this.db.updateTrack(id, updateTrackDto);
+  async update(id: string, dto: UpdateTrackDto): Promise<Track> {
+    let track = await this.trackRepository.findOne({ where: { id } });
+    if (!track) {
+      return;
+    }
+
+    track = await this.trackRepository.merge(track, dto);
+
+    return await this.trackRepository.save(track);
   }
 
-  remove(id: string) {
-    return this.db.deleteTrackById(id);
+  async remove(id: string): Promise<Track> {
+    const track = await this.trackRepository.findOne({ where: { id } });
+    if (!track) {
+      return;
+    }
+    await this.trackRepository.delete(id);
+    return track;
   }
 }

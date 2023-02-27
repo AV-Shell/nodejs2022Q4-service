@@ -1,0 +1,45 @@
+version: '3'
+services:
+  node:
+    build: .
+    image: avshell/node2022q4
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./logs:/usr/src/app/logs
+      - ./src:/usr/src/app/src 
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      - PORT=${PORT}
+    env_file:
+      - .env
+    networks:
+      - custom-network
+    container_name: avshell-node
+  postgres:
+    build: ./db/
+    image: avshell/postgres2022q4
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    restart: always
+    environment:
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    env_file:
+      - .env
+    volumes:
+      - db_log_volume:/logs:z
+      - db_data_volume:/var/lib/postgresql/data
+    networks:
+      - custom-network
+
+volumes: 
+        db_data_volume:
+        db_log_volume:
+networks:
+    custom-network:
+        driver: bridge 

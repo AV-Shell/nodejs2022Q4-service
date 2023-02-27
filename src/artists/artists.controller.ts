@@ -19,29 +19,29 @@ export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
   @Post()
-  create(@Body() createArtistDto: CreateArtistDto) {
-    return this.artistsService.create(createArtistDto);
+  async create(@Body() createArtistDto: CreateArtistDto) {
+    return await this.artistsService.create(createArtistDto);
   }
 
   @Get()
-  findAll() {
-    return this.artistsService.findAll();
+  async findAll() {
+    return await this.artistsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const artist = this.artistsService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const artist = await this.artistsService.findOne(id);
     if (artist) return artist;
 
     throw new NotFoundException();
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
-    const artist = this.artistsService.update(id, updateArtistDto);
+    const artist = await this.artistsService.update(id, updateArtistDto);
     if (artist) return artist;
 
     throw new NotFoundException();
@@ -49,8 +49,8 @@ export class ArtistsController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const artist = this.artistsService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const artist = await this.artistsService.remove(id);
     if (artist) return artist;
 
     throw new NotFoundException();

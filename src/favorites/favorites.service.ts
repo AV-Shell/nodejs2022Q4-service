@@ -1,58 +1,163 @@
-import { Inject, Injectable } from '@nestjs/common';
-import InMemoryDB from 'src/db/db';
-import { filter, includes } from 'lodash';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { filter, reduce } from 'lodash';
+import { Favorites } from './entities/favorites.entity';
+import { Album } from '../albums/entities/album.entity';
+import { Artist } from '../artists/entities/artist.entity';
+import { Track } from '../tracks/entities/track.entity';
 
 @Injectable()
 export class FavoritesService {
-  constructor(@Inject('IInMemoryDB') private db: InMemoryDB) {}
+  constructor(
+    @InjectRepository(Favorites)
+    private favoritesRepository: Repository<Favorites>,
+    @InjectRepository(Album)
+    private albumsRepository: Repository<Album>,
+    @InjectRepository(Artist)
+    private artistsRepository: Repository<Artist>,
+    @InjectRepository(Track)
+    private tracksRepository: Repository<Track>,
+  ) {}
 
-  findAll() {
-    const fav = this.db.getAllFavorites();
+  async findAll() {
+    const favorites = await this.favoritesRepository.find({
+      // relations: ['artist', 'track', 'album'],
+      relations: {
+        artist: true,
+        track: true,
+        album: true,
+      },
+    });
+
+    console.log('favorites', favorites);
+
+    const result = reduce(
+      favorites,
+      (m, f) => {
+        console.log();
+
+        if (f.type === 'artist') {
+          m.artists.push(f.artist);
+        }
+        if (f.type === 'album') {
+          m.albums.push(f.album);
+        }
+        if (f.type === 'track') {
+          m.tracks.push(f.track);
+        }
+
+        return m;
+      },
+      {
+        artists: [],
+        albums: [],
+        tracks: [],
+      },
+    );
+
+    // console.log(result);
 
     return {
-      artists: filter(this.db.getAllArtists(), (a) =>
-        includes(fav.artists, a.id),
-      ),
-      albums: filter(this.db.getAllAlbums(), (a) => includes(fav.albums, a.id)),
-      tracks: filter(this.db.getAllTracks(), (t) => includes(fav.tracks, t.id)),
+      artists: filter(result.artists, (x) => x),
+      albums: filter(result.albums, (x) => x),
+      tracks: filter(result.tracks, (x) => x),
     };
   }
 
-  addTrack(id: string) {
-    const track = this.db.getTrackById(id);
-
+  async addTrack(id: string): Promise<Favorites> {
+    const track = await this.tracksRepository.findOne({ where: { id } });
+    console.log('track', track);
     if (!track) {
       return;
     }
-    return this.db.addTrackToFavorites(id);
+
+    const existedFavoriteTrack = await this.favoritesRepository.findOne({
+      where: { typeId: id, type: 'track' },
+    });
+    if (existedFavoriteTrack) {
+      return existedFavoriteTrack;
+    }
+
+    const favoritesTrack = this.favoritesRepository.create({
+      typeId: id,
+      type: 'track',
+    });
+
+    return this.favoritesRepository.save(favoritesTrack);
   }
 
-  addAlbum(id: string) {
-    const album = this.db.getAlbumById(id);
+  async removeTrack(id: string): Promise<Favorites> {
+    const favoriteTrack = await this.favoritesRepository.findOne({
+      where: { typeId: id, type: 'track' },
+    });
+    if (!favoriteTrack) {
+      return;
+    }
+    await this.favoritesRepository.delete(favoriteTrack.id);
+    return favoriteTrack;
+  }
 
+  async addAlbum(id: string): Promise<Favorites> {
+    const album = await this.albumsRepository.findOne({ where: { id } });
     if (!album) {
       return;
     }
-    return this.db.addAlbumToFavorites(id);
+
+    const existedFavoriteAlbum = await this.favoritesRepository.findOne({
+      where: { typeId: id, type: 'album' },
+    });
+    if (existedFavoriteAlbum) {
+      return existedFavoriteAlbum;
+    }
+
+    const favoritesAlbum = this.favoritesRepository.create({
+      typeId: id,
+      type: 'album',
+    });
+
+    return this.favoritesRepository.save(favoritesAlbum);
   }
 
-  addArtist(id: string) {
-    const artist = this.db.getArtistById(id);
+  async removeAlbum(id: string): Promise<Favorites> {
+    const favoriteAlbum = await this.favoritesRepository.findOne({
+      where: { typeId: id, type: 'album' },
+    });
+    if (!favoriteAlbum) {
+      return;
+    }
+    await this.favoritesRepository.delete(favoriteAlbum.id);
+    return favoriteAlbum;
+  }
 
+  async addArtist(id: string): Promise<Favorites> {
+    const artist = await this.artistsRepository.findOne({ where: { id } });
     if (!artist) {
       return;
     }
+    const existedFavoriteArtist = await this.favoritesRepository.findOne({
+      where: { typeId: id, type: 'artist' },
+    });
+    if (existedFavoriteArtist) {
+      return existedFavoriteArtist;
+    }
 
-    return this.db.addArtistToFavorites(id);
+    const favoritesArtist = this.favoritesRepository.create({
+      typeId: id,
+      type: 'artist',
+    });
+
+    return this.favoritesRepository.save(favoritesArtist);
   }
 
-  removeTrack(id: string) {
-    return this.db.removeTrackFromFavorites(id);
-  }
-  removeAlbum(id: string) {
-    return this.db.removeAlbumFromFavorites(id);
-  }
-  removeArtist(id: string) {
-    return this.db.removeArtistFromFavorites(id);
+  async removeArtist(id: string): Promise<Favorites> {
+    const favoriteArtist = await this.favoritesRepository.findOne({
+      where: { typeId: id, type: 'artist' },
+    });
+    if (!favoriteArtist) {
+      return;
+    }
+    await this.favoritesRepository.delete(favoriteArtist.id);
+    return favoriteArtist;
   }
 }
