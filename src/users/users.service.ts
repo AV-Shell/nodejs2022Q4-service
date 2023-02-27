@@ -23,7 +23,6 @@ export class UsersService {
     const hashPassword = await this.generateHashPassword(
       createUserDto.password,
     );
-    console.log('hashPassword', hashPassword);
     let user = await this.usersRepository.create({
       ...createUserDto,
       password: hashPassword,

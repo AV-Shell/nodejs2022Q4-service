@@ -20,7 +20,6 @@ export class AuthService {
   ) {}
 
   async signup(userDto: CreateUserDto) {
-    console.log(userDto);
     const existedUser = await this.usersService.getUserByLogin(userDto.login);
     if (existedUser) {
       throw new BadRequestException();
