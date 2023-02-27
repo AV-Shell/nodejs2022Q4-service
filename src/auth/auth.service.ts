@@ -6,6 +6,7 @@ import { ResponceUserDto } from '../users/dto/responce-user.dto';
 import {
   BadRequestException,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common/exceptions';
 import { JwtService } from '@nestjs/jwt/dist';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -34,9 +35,14 @@ export class AuthService {
   }
 
   async refresh(refreshDto: RefreshTokenDto) {
-    console.log(`Refresh token dto`, refreshDto);
+    const { refreshToken } = refreshDto;
+
+    if (typeof refreshToken !== 'string') {
+      throw new UnauthorizedException();
+    }
+
     try {
-      const verifyResult = this.jwtService.verify(refreshDto.refreshToken, {
+      const verifyResult = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET_KEY,
       });
 
@@ -44,12 +50,12 @@ export class AuthService {
 
       const existedUser = await this.usersService.getUserByLogin(login);
       if (!existedUser || existedUser.id !== userId) {
-        throw new UnauthorizedException();
+        throw new ForbiddenException();
       }
 
       return this.generateTokens(User.toResponse(existedUser));
     } catch (error) {
-      throw new UnauthorizedException({ message: 'User not authorised' });
+      throw new ForbiddenException({ message: 'forbidden' });
     }
   }
 
