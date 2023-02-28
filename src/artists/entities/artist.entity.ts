@@ -7,6 +7,7 @@ import {
   OneToOne,
 } from 'typeorm';
 import { Track } from '../../tracks/entities/track.entity';
+import { Album } from '../../albums/entities/album.entity';
 import { Favorites } from '../../favorites/entities/favorites.entity';
 
 @Entity()
@@ -34,6 +35,9 @@ export class Artist {
 
   @OneToMany(() => Track, (track) => track.artistId)
   tracks: Track[];
+
+  @OneToMany(() => Album, (album) => album.artistId)
+  albums: Album[];
 
   @OneToOne(() => Favorites, (favorites) => favorites.artist)
   favorites: Favorites;

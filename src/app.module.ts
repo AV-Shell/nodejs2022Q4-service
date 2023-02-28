@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -13,12 +14,22 @@ import { Artist } from './artists/entities/artist.entity';
 import { Favorites } from './favorites/entities/favorites.entity';
 import { Track } from './tracks/entities/track.entity';
 import { User } from './users/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
+import { MyExceptionFilter } from './common/exception.filter';
+import { LoggerMiddleware } from './logger/logger.middleware';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: MyExceptionFilter,
+    },
+  ],
   imports: [
-    ConfigModule.forRoot({ envFilePath: '.env' }),
+    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -28,21 +39,25 @@ import { User } from './users/entities/user.entity';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       dropSchema: true,
-      synchronize: false,
-      migrationsRun: true,
+      synchronize: true,
       migrations: ['src/migrations/*'],
       logging: false,
       entities: [User, Album, Artist, Favorites, Track],
-      autoLoadEntities: true,
     }),
     UsersModule,
     TracksModule,
     ArtistsModule,
     AlbumsModule,
     FavoritesModule,
+    AuthModule,
+    LoggerModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
 
 console.log({
   host: process.env.POSTGRES_HOST,

@@ -14,7 +14,7 @@ git clone https://github.com/AV-Shell/nodejs2022Q4-service.git
 ## Change branch to dev
 
 ```
-git checkout task7-home-library-service-part-2-dev
+git checkout task8-home-library-service-part-3-dev
 ```
 
 ## Installing NPM modules
@@ -66,7 +66,7 @@ npm install
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
+To run all tests without authorization // In this task all test without authorization must be failure!
 
 ```
 npm run test
@@ -105,3 +105,4 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+

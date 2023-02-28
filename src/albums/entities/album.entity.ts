@@ -4,8 +4,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
   OneToOne,
 } from 'typeorm';
+import { Artist } from '../../artists/entities/artist.entity';
 import { Track } from '../../tracks/entities/track.entity';
 import { Favorites } from '../../favorites/entities/favorites.entity';
 
@@ -42,6 +45,13 @@ export class Album {
     default: null,
   })
   artistId: string | null; // refers to Artist
+
+  @ManyToOne(() => Artist, (artist) => artist.albums, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'artistId' })
+  artist: string | null;
 
   @OneToMany(() => Track, (track) => track.albumId)
   tracks: Track[];
